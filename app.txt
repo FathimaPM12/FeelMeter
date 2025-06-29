@@ -1,0 +1,32 @@
+from flask import Flask, request, render_template
+from textblob import TextBlob
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    sentiment = None
+    text = ''
+    sentiment_scores = {'Positive': 0, 'Neutral': 0, 'Negative': 0}
+
+    if request.method == 'POST':
+        text = request.form['text']
+        blob = TextBlob(text)
+        polarity = blob.sentiment.polarity  # range: -1 to 1
+
+        if polarity > 0.1:
+            sentiment = 'Positive'
+            sentiment_scores['Positive'] = polarity
+            sentiment_scores['Neutral'] = 1 - polarity
+        elif polarity < -0.1:
+            sentiment = 'Negative'
+            sentiment_scores['Negative'] = abs(polarity)
+            sentiment_scores['Neutral'] = 1 - abs(polarity)
+        else:
+            sentiment = 'Neutral'
+            sentiment_scores['Neutral'] = 1
+
+    return render_template('index.html', text=text, sentiment=sentiment, sentiment_scores=sentiment_scores)
+
+if __name__ == '__main__':
+    app.run(debug=True)

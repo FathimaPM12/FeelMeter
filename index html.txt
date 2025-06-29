@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to right, #dfe9f3, #ffffff);
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 400px;
+            height: 100px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 18px;
+        }
+
+        .positive {
+            color: green;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: red;
+            font-weight: bold;
+        }
+
+        .neutral {
+            color: gray;
+            font-weight: bold;
+        }
+
+        canvas {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Sentiment Analysis</h1>
+
+    <form method="POST">
+        <textarea name="text" placeholder="Type something here...">{{ text or '' }}</textarea><br>
+        <input type="submit" value="Analysis">
+    </form>
+
+    {% if sentiment %}
+    <div class="result">
+        <p><strong>You wrote:</strong><br><em>{{ text }}</em></p>
+        <p>
+            <strong>Sentiment:</strong>
+            <span class="{{ sentiment.lower() }}">{{ sentiment }}</span>
+            {% if sentiment|lower == 'positive' %}
+                <span style="font-size: 24px;">😊</span>
+            {% elif sentiment|lower == 'negative' %}
+                <span style="font-size: 24px;">🙁</span>
+            {% else %}
+                <span style="font-size: 24px;">😐</span>
+            {% endif %}
+        </p>
+
+        <canvas id="sentimentChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        const data = {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                label: 'Sentiment Score (%)',
+                data: [
+                    {{ sentiment_scores['Positive'] * 100 }},
+                    {{ sentiment_scores['Neutral'] * 100 }},
+                    {{ sentiment_scores['Negative'] * 100 }}
+                ],
+                backgroundColor: ['green', 'gray', 'red'],
+                borderRadius: 5
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.raw.toFixed(1) + '%'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Score (%)'
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(
+            document.getElementById('sentimentChart'),
+            config
+        );
+    </script>
+    {% endif %}
+</body>
+</html>
