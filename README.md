@@ -44,3 +44,7 @@ FeelMeter/
 ├── app.py
 └── templates/
     └── index.html
+
+Demo Video
+Watch a short demo of project FeelMeter:
+ 👉 [Project FeelMeter-Demo Video](https://github.com/FathimaPM12/FeelMeter/blob/main/project%20demo%20video.mp4)
